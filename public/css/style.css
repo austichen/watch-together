@@ -1,0 +1,29 @@
+.video-results li {
+  cursor: pointer;
+}
+
+.player-controls {
+  width: 640px;
+  height: 30px;
+  background-color: black;
+}
+
+.player-controls .player-buttons {
+  margin-top: 3px;
+  margin-left: 15px;
+}
+
+.player-controls .player-buttons .fas {
+  padding: 0px 5px 0px 5px;
+  color: #f4f4f4;
+}
+
+.progress {
+  width: 550px;
+  margin-bottom: 5px;
+  display: inline-block !important;
+}
+
+iframe {
+  pointer-events: none;
+}
