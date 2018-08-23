@@ -30,8 +30,33 @@ app.get('/', (req, res) => {
 app.use('/room', roomRoute);
 
 
-const getCurrentVideo = roomId => {
+const getCurrentVideo = (roomId, thisSocket) => {
+  let clients = io.sockets.adapter.rooms[roomId].sockets;
+  console.log(clients);
+  let numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+  if (numClients<=1) {
+    return {
+      id: 'cZAw8qxn0ZE',
+      currentTime: 0,
+      isPlaying: false
+    }
+  }
+  //get a random client
+  for (let clientId in clients ) {
+     //this is the socket of each client in the room.
+     let clientSocket = io.sockets.connected[clientId];
+     if (clientSocket !=thisSocket) {
+
+       console.log('clientSocket id: ',clientSocket.id)
+       io.to(clientSocket.id).emit('get current video status', thisSocket.id);
+       console.log('SUCCESS')
+       return null;
+     }
+
+}
+//in case anything goes wrong
   //FOR DEVELOPTMENT ONLY REMOVE THIS AFTER
+  /*
   if(!app.locals.roomsList[roomId]) {
     return {
       id: 'cZAw8qxn0ZE',
@@ -48,6 +73,7 @@ const getCurrentVideo = roomId => {
   } else {
     throw new Error("Room not found.")
   }
+  */
 }
 
 const updateCurrentVideo = (roomId, videoId) => {
@@ -62,26 +88,36 @@ io.on('connection', socket => {
   socket.on('room connect', roomId => {
     currentRoomId = roomId;
     socket.join(roomId, () => {
+          console.log('connected to room '+roomId);
+      if(app.locals.roomsList[roomId]==undefined) {
+        return socket.disconnect();
+      }
       app.locals.roomsList[roomId].numUsers++;
     });
 
-    let currentVideoData = getCurrentVideo(roomId);
-    console.log('connected to room '+roomId);
-    console.log('current video datA: ',currentVideoData)
-        console.log(socket)
-    socket.emit('initialize video', currentVideoData);
+    let currentVideoData = getCurrentVideo(roomId, socket);
+    if(currentVideoData!=null) {
+      socket.emit('initialize video', currentVideoData);
+    }
+
+
+  })
+  socket.on('receive current video status', returnObject => {
+    let currentVideoData = returnObject.videoInfo;
+    let receiverSocketId = returnObject.receiverSocket;
+    console.log('currentVideoData: ', currentVideoData);
+    io.to(receiverSocketId).emit('initialize video', currentVideoData);
   })
   socket.on('disconnect', () => {
-    console.log('currentRoomId: ',currentRoomId)
+    if(app.locals.roomsList[currentRoomId]==undefined) {
+      return socket.disconnect();
+    }
     app.locals.roomsList[currentRoomId].numUsers--;
     console.log(app.locals.roomsList[currentRoomId].numUsers)
     if (app.locals.roomsList[currentRoomId].numUsers<=0) {
-      console.log('deleting room')
       delete app.locals.roomsList[currentRoomId];
+      console.log('deleting room')
     }
-  })
-  socket.on('receive room', roomId => {
-
   })
   socket.on('set video', (roomId, videoId) => {
     updateCurrentVideo(roomId, videoId);

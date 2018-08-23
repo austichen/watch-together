@@ -95,14 +95,44 @@ function onYouTubeIframeAPIReady() {
   initializeConnection();
 }
 
-// 4. The API will call this function when the video player is ready.
-function onPlayerReady(event) {
+function checkTime(previousTime) {
+  setTimeout(() => {
+    let currentime = player.getCurrentTime();
+    if (currentTime != previousTime) {
+      updateProgressBar(currentTime);
+    }
+  })
+}
 
-  /*
-  if(isPlaying) {
-    event.target.playVideo();
+// 4. The API will call this function when the video player is ready.
+let currentTime = 0, timeUpdater = null, videoLength;
+
+function onPlayerReady(event) {
+  return new new Promise(function(resolve, reject) {
+    resolve();
+  });
+}
+
+function updateTime() {
+  let previousTime = currentTime;
+  if(player && player.getCurrentTime) {
+    currentTime = player.getCurrentTime();
   }
-  */
+  if(currentTime !== previousTime) {
+    onVideoTimeUpdate(currentTime);
+  }
+}
+
+function onVideoTimeUpdate(currentTime) {
+  updateProgressBar(currentTime);
+}
+
+function updateProgressBar(time) {
+  console.log('current time: '+time,' typeof: ',typeof time);
+  console.log('video lenght: '+videoLength);
+  let percentWatched = time*100/videoLength;
+  console.log(percentWatched);
+  $('.progress-bar').css('width', `${percentWatched}%`).attr('aria-valuenow', percentWatched);
 }
 
 // 5. The API calls this function when the player's state changes.
@@ -118,13 +148,28 @@ function onPlayerStateChange(event) {
     console.log('ready to play');
   } else if (event.data == 1) {
     console.log('play at ', currentTime);
+    videoLength = player.getDuration();
+    timeupdater = setInterval(updateTime, 300);
   } else if (event.data == 2) {
     console.log('pause at ', currentTime);
+    //testing
+    console.log('video URL: ',player.getVideoUrl());
+    console.log('video embedded: ',player.getVideoEmbedCode());
+    clearInterval(timeupdater);
   }
 }
 
 function stopVideo() {
   player.stopVideo();
+}
+
+function getVideoId() {
+  let video_id = player.getVideoUrl().split('v=')[1];
+  let ampersandPosition = video_id.indexOf('&');
+  if (ampersandPosition != -1) {
+    video_id = video_id.substring(0, ampersandPosition);
+  }
+  return video_id;
 }
 
 console.log(typeof roomId)
@@ -142,15 +187,20 @@ function initializeConnection() {
   socket.on('initialize video', videoData => {
     console.log('initialize video called')
     setTimeout(() => {
-      player.cueVideoById(videoData.id, videoData.currentTime+1)
       if(videoData.isPlaying) {
-        player.playVideo();
+        console.log('isplaying is true')
+        player.loadVideoById(videoData.id, videoData.currentTime+2)
+      } else {
+        player.cueVideoById(videoData.id, videoData.currentTime+2)
       }
+      currentTime = videoData.currentTime+2;
+      console.log('video lenghto on set: '+player.getDuration())
     }, 1000)
   })
   socket.on('set video', videoId => {
     console.log('set video')
     player.loadVideoById(videoId);
+    currentTime=0;
   })
   socket.on('pause video', () => {
     player.pauseVideo();
@@ -158,8 +208,29 @@ function initializeConnection() {
   socket.on('play video', () => {
     player.playVideo();
   })
-  socket.on('get room', () => {
-    console.log('get room');
-    socket.emit('receive room', roomId);
+  socket.on('get current video status', (receiverSocket) => {
+    console.log('get current video status');
+    let videoInfo;
+    if(player && player.getPlayerState) {
+      videoInfo = {};
+      let playerState = player.getPlayerState();
+      videoInfo.id = getVideoId();
+
+      if (playerState == -1 || playerState == 5) {
+        videoInfo.currentTime = 0;
+        videoInfo.isPlaying = false;
+      } else if (playerState == 1 || playerState == 3) {
+        videoInfo.currentTime = player.getCurrentTime();
+        videoInfo.isPlaying = true;
+      } else if (playerState == 0) {
+        videoInfo.currentTime = player.getDuration();
+        videoInfo.isPlaying = false;
+      } else {
+        videoInfo.currentTime = player.getCurrentTime();
+        videoInfo.isPlaying = false;
+      }
+
+    }
+    socket.emit('receive current video status', {videoInfo: videoInfo, receiverSocket: receiverSocket})
   })
 }

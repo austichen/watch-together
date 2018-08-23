@@ -20,8 +20,7 @@
 
 .progress {
   width: 550px;
-  margin-bottom: 5px;
-  display: inline-block !important;
+  display: inline-flex !important;
 }
 
 iframe {
