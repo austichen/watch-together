@@ -18,8 +18,7 @@ function copyLinkToClipboard() {
 
 
 // YOUTUBE API STUFF
-
-
+let currentTime = 0, timeUpdater = null, videoLength, socket, videoDataForInit;
 
 function youtubeApiInit() {
   const searchQuery = document.getElementById('youtube_search').value;
@@ -56,21 +55,18 @@ function setVideo(id) {
 
 
 if($('#player').length) {
-  console.log('player is ready')
-  var tag = document.createElement('script');
-
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  console.log('initialize connection called');
+  initializeConnection();
 }
 
 var player, youtubeAPIReady=false;
 
 function onYouTubeIframeAPIReady() {
+  console.log('youtube API ready')
   player = new YT.Player('player', {
     height: '390',
     width: '640',
-    videoId: 'FJjPdUagmKM',
+    videoId: videoDataForInit.id,
     events: {
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange
@@ -84,15 +80,6 @@ function onYouTubeIframeAPIReady() {
       showinfo: 0
     }
   });
-  $('#play-button').click(() => {
-    socket.emit('play video', roomId);
-    player.playVideo();
-  });
-
-  $('#pause-button').click(() => {
-    socket.emit('pause video', roomId);
-  });
-  initializeConnection();
 }
 
 function checkTime(previousTime) {
@@ -105,21 +92,53 @@ function checkTime(previousTime) {
 }
 
 // 4. The API will call this function when the video player is ready.
-let currentTime = 0, timeUpdater = null, videoLength;
 
 function onPlayerReady(event) {
-  return new new Promise(function(resolve, reject) {
-    resolve();
+  console.log('player is ready')
+  initializeVideo();
+  initializePlayerButtons();
+
+}
+
+function initializeVideo() {
+
+  if(videoDataForInit.isPlaying) {
+    console.log('video is initialized to play');
+    player.loadVideoById(videoDataForInit.id, videoDataForInit.currentTime+2);
+    currentTime = videoDataForInit.currentTime+2;
+  } else {
+    console.log('video is not playing');
+    player.cueVideoById(videoDataForInit.id, videoDataForInit.currentTime);
+    currentTime = videoDataForInit.currentTime;
+  }
+}
+
+function initializePlayerButtons() {
+  $('#play-button').click(() => {
+    socket.emit('play video', roomId);
   });
+
+  $('#pause-button').click(() => {
+    socket.emit('pause video', roomId);
+  });
+  $('.progress').click(function(e){
+    let scrubToTime = e.offsetX * player.getDuration()/ $(this).width();
+    console.log(scrubToTime);
+    socket.emit('scrub video', scrubToTime)
+  })
 }
 
 function updateTime() {
   let previousTime = currentTime;
   if(player && player.getCurrentTime) {
     currentTime = player.getCurrentTime();
+    //console.log(player.getPlayerState())
   }
   if(currentTime !== previousTime) {
     onVideoTimeUpdate(currentTime);
+  } else if (player.getPlayerState()===1) {
+    //console.log('play video is called')
+    player.playVideo();
   }
 }
 
@@ -128,10 +147,10 @@ function onVideoTimeUpdate(currentTime) {
 }
 
 function updateProgressBar(time) {
-  console.log('current time: '+time,' typeof: ',typeof time);
-  console.log('video lenght: '+videoLength);
+  //console.log('current time: '+time,' typeof: ',typeof time);
+  //console.log('video lenght: '+videoLength);
   let percentWatched = time*100/videoLength;
-  console.log(percentWatched);
+  //console.log(percentWatched);
   $('.progress-bar').css('width', `${percentWatched}%`).attr('aria-valuenow', percentWatched);
 }
 
@@ -152,9 +171,6 @@ function onPlayerStateChange(event) {
     timeupdater = setInterval(updateTime, 300);
   } else if (event.data == 2) {
     console.log('pause at ', currentTime);
-    //testing
-    console.log('video URL: ',player.getVideoUrl());
-    console.log('video embedded: ',player.getVideoEmbedCode());
     clearInterval(timeupdater);
   }
 }
@@ -174,8 +190,6 @@ function getVideoId() {
 
 console.log(typeof roomId)
 
-let socket;
-
 //SOCKET IO
 function initializeConnection() {
   console.log('client side')
@@ -185,7 +199,16 @@ function initializeConnection() {
     socket.emit('room connect', roomId);
   })
   socket.on('initialize video', videoData => {
+    console.log('player is ready')
+    videoDataForInit = videoData;
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     console.log('initialize video called')
+    /*
+
     setTimeout(() => {
       if(videoData.isPlaying) {
         console.log('isplaying is true')
@@ -196,6 +219,7 @@ function initializeConnection() {
       currentTime = videoData.currentTime+2;
       console.log('video lenghto on set: '+player.getDuration())
     }, 1000)
+    */
   })
   socket.on('set video', videoId => {
     console.log('set video')
@@ -207,6 +231,9 @@ function initializeConnection() {
   })
   socket.on('play video', () => {
     player.playVideo();
+  })
+  socket.on('scrub video', scrubToTime => {
+    player.seekTo(scrubToTime, true);
   })
   socket.on('get current video status', (receiverSocket) => {
     console.log('get current video status');
@@ -224,7 +251,7 @@ function initializeConnection() {
         videoInfo.isPlaying = true;
       } else if (playerState == 0) {
         videoInfo.currentTime = player.getDuration();
-        videoInfo.isPlaying = false;
+        videoInfo.isPlaying = true;
       } else {
         videoInfo.currentTime = player.getCurrentTime();
         videoInfo.isPlaying = false;

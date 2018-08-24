@@ -130,4 +130,7 @@ io.on('connection', socket => {
   socket.on('play video', roomId => {
     io.sockets.in(roomId).emit('play video');
   })
+  socket.on('scrub video', scrubToTime => {
+    io.sockets.in(currentRoomId).emit('scrub video', scrubToTime);
+  })
 })

@@ -23,6 +23,15 @@
   display: inline-flex !important;
 }
 
-iframe {
+.progress-bar {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
+}
+
+.player-container {
+  height: 390px;
   pointer-events: none;
 }
