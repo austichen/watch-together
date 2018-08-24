@@ -35,3 +35,15 @@
   height: 390px;
   pointer-events: none;
 }
+
+#play-toggle {
+  cursor: pointer;
+}
+
+#volume-button {
+  cursor: pointer;
+  display: inline-block;
+  width: 18px;
+  padding-right: 10px;
+  box-sizing: content-box;
+}

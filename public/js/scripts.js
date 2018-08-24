@@ -114,18 +114,35 @@ function initializeVideo() {
 }
 
 function initializePlayerButtons() {
-  $('#play-button').click(() => {
-    socket.emit('play video', roomId);
-  });
-
-  $('#pause-button').click(() => {
-    socket.emit('pause video', roomId);
+  $('#play-toggle').click(() => {
+    let playerState = player.getPlayerState();
+    if(playerState === 1) {
+      socket.emit('pause video', roomId);
+    } else if (playerState === 0 || playerState === 5 || playerState === 2) {
+      socket.emit('play video', roomId);
+    }
   });
   $('.progress').click(function(e){
     let scrubToTime = e.offsetX * player.getDuration()/ $(this).width();
     console.log(scrubToTime);
     socket.emit('scrub video', scrubToTime)
   })
+  $('#volume-button').click(function() {
+    player.isMuted() ? unmuteVideo($(this)) : muteVideo($(this));
+  })
+}
+
+function unmuteVideo(volumeButton) {
+  console.log(volumeButton)
+  volumeButton.removeClass('fa-volume-off');
+  volumeButton.addClass('fa-volume-up');
+  player.unMute();
+}
+
+function muteVideo(volumeButton) {
+  volumeButton.removeClass('fa-volume-up');
+  volumeButton.addClass('fa-volume-off');
+  player.mute();
 }
 
 function updateTime() {
@@ -137,7 +154,6 @@ function updateTime() {
   if(currentTime !== previousTime) {
     onVideoTimeUpdate(currentTime);
   } else if (player.getPlayerState()===1) {
-    //console.log('play video is called')
     player.playVideo();
   }
 }
@@ -147,10 +163,7 @@ function onVideoTimeUpdate(currentTime) {
 }
 
 function updateProgressBar(time) {
-  //console.log('current time: '+time,' typeof: ',typeof time);
-  //console.log('video lenght: '+videoLength);
   let percentWatched = time*100/videoLength;
-  //console.log(percentWatched);
   $('.progress-bar').css('width', `${percentWatched}%`).attr('aria-valuenow', percentWatched);
 }
 
@@ -160,18 +173,27 @@ function updateProgressBar(time) {
 var done = false;
 
 function onPlayerStateChange(event) {
+  const playToggle = $('#play-toggle');
   const currentTime = event.target.j.currentTime;
   if (event.data == -1) {
     console.log('new video at');
   } else if (event.data == 5) {
-    console.log('ready to play');
+    playToggle.removeClass('fa-pause');
+    playToggle.addClass('fa-play');
   } else if (event.data == 1) {
     console.log('play at ', currentTime);
+    playToggle.removeClass('fa-play');
+    playToggle.addClass('fa-pause');
     videoLength = player.getDuration();
     timeupdater = setInterval(updateTime, 300);
   } else if (event.data == 2) {
     console.log('pause at ', currentTime);
+    playToggle.removeClass('fa-pause');
+    playToggle.addClass('fa-play');
     clearInterval(timeupdater);
+  } else if (event.data == 0) {
+    playToggle.removeClass('fa-pause');
+    playToggle.addClass('fa-play');
   }
 }
 
@@ -188,8 +210,6 @@ function getVideoId() {
   return video_id;
 }
 
-console.log(typeof roomId)
-
 //SOCKET IO
 function initializeConnection() {
   console.log('client side')
@@ -202,24 +222,9 @@ function initializeConnection() {
     console.log('player is ready')
     videoDataForInit = videoData;
     var tag = document.createElement('script');
-
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    console.log('initialize video called')
-    /*
-
-    setTimeout(() => {
-      if(videoData.isPlaying) {
-        console.log('isplaying is true')
-        player.loadVideoById(videoData.id, videoData.currentTime+2)
-      } else {
-        player.cueVideoById(videoData.id, videoData.currentTime+2)
-      }
-      currentTime = videoData.currentTime+2;
-      console.log('video lenghto on set: '+player.getDuration())
-    }, 1000)
-    */
   })
   socket.on('set video', videoId => {
     console.log('set video')
