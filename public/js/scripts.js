@@ -36,11 +36,24 @@ function youtubeApiInit() {
     console.log(response.result.items)
     document.getElementsByClassName('video-results')[0].innerHTML = ''
     for (video of response.result.items) {
-      document.getElementsByClassName('video-results')[0].innerHTML += (
-        `<li onclick="setVideo('${video.id.videoId}')">${video.snippet.title}</li>`
-      )
+      document.getElementsByClassName('video-results')[0].innerHTML += renderVideoCard(video);
     }
   })
+}
+
+function renderVideoCard(video) {
+  return `<li><div class="card" onclick="setVideo('${video.id.videoId}')">
+    <div class="card-body">
+      <img class="card-img-top"
+        src="${video.snippet.thumbnails.default.url}"
+        style="height: ${video.snippet.thumbnails.default.height}px; width: ${video.snippet.thumbnails.default.width}px"
+        alt="Card image cap"
+      >
+      <h5 class="card-title">${video.snippet.title}</h5>
+      <p class="font-weight-bold card-text">${video.snippet.channelTitle}</p>
+      <p class="font-weight-light card-text">${video.snippet.description}</p>
+    </div>
+  </div></li>`
 }
 
 function searchForVideo() {
@@ -82,14 +95,6 @@ function onYouTubeIframeAPIReady() {
   });
 }
 
-function checkTime(previousTime) {
-  setTimeout(() => {
-    let currentime = player.getCurrentTime();
-    if (currentTime != previousTime) {
-      updateProgressBar(currentTime);
-    }
-  })
-}
 
 // 4. The API will call this function when the video player is ready.
 

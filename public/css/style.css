@@ -1,5 +1,11 @@
+ul {
+  list-style: none;
+  padding-left: 0px;
+}
+
 .video-results li {
   cursor: pointer;
+  margin-bottom: 10px;
 }
 
 .player-controls {
@@ -46,4 +52,21 @@
   width: 18px;
   padding-right: 10px;
   box-sizing: content-box;
+}
+
+.card-img-top {
+  float: left;
+  margin-right: 10px;
+}
+
+.card-body {
+  padding: 0px !important;
+}
+
+.card-title {
+  margin-bottom: 0px !important;
+}
+
+.card-text {
+  margin-bottom: 0px !important;
 }
