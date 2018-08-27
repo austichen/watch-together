@@ -19,8 +19,6 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname+'/public'));
 app.locals.roomsList = {};
 
-console.log('app.locals test: ',app.locals)
-
 app.get('/', (req, res) => {
   res.render('home')
 })

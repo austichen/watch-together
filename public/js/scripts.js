@@ -22,6 +22,7 @@ let currentTime = 0, timeUpdater = null, videoLength, socket, videoDataForInit;
 
 function youtubeApiInit() {
   const searchQuery = document.getElementById('youtube_search').value;
+  //TODO: hide api key
   gapi.client.init({
     'apiKey': 'AIzaSyCulGJktSYgSIK7F5Xekdpb8__eNOYy1aI',
     'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest']
@@ -191,6 +192,7 @@ function onPlayerStateChange(event) {
     playToggle.addClass('fa-pause');
     videoLength = player.getDuration();
     timeupdater = setInterval(updateTime, 300);
+    $('#video-duration').html(getVideoDurationInMins(videoLength))
   } else if (event.data == 2) {
     console.log('pause at ', currentTime);
     playToggle.removeClass('fa-pause');
@@ -200,6 +202,13 @@ function onPlayerStateChange(event) {
     playToggle.removeClass('fa-pause');
     playToggle.addClass('fa-play');
   }
+}
+
+function getVideoDurationInMins(seconds) {
+  let minutes = Math.floor(seconds/60);
+  let _seconds = Math.round(seconds-(minutes*60));
+  if(_seconds < 10) _seconds = '0'+_seconds;
+  return `${minutes}:${_seconds}`;
 }
 
 function stopVideo() {

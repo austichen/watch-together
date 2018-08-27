@@ -14,22 +14,27 @@
     <div class="row justify-content-center mb-3">
       <div class="player-container">
         <div id="player"></div>
-      </div>
-      <div class="player-controls">
-        <div class="player-buttons">
-          <i class="fas fa-play" id="play-toggle"></i>
-          <i class="fas fa-volume-up" id="volume-button"></i>
-          <div class="progress" style="height: 5px;">
-            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="player-controls">
+          <div class="player-buttons">
+            <i class="fas fa-play" id="play-toggle"></i>
+            <i class="fas fa-volume-up" id="volume-button"></i>
+            <div class="progress" style="height: 5px;">
+              <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <span id="video-duration" class="font-weight-normal"></span>
           </div>
         </div>
       </div>
     </div>
-    <div class="input-group mb-3">
-      <input type="text" class="form-control" placeholder="Search for a video here" id="youtube_search">
-      <div class="input-group-append">
+    <div class="row justify-content-center">
+      <div class="col col-md-8">
+       <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Search for a video here" id="youtube_search">
+        <div class="input-group-append">
         <button class="btn btn-outline-secondary" onclick="searchForVideo()" type="button" id="search_button">Search</button>
       </div>
+      </div>
+    </div>
     </div>
     <div class="video-results-container">
       <ul class="video-results"></ul>
