@@ -1,4 +1,5 @@
 const router = require('express').Router();
+require('dotenv').config()
 
 function doesRoomExist(req, res, next) {
     if (!req.app.locals.roomsList[req.params.roomId.toString()]) {
@@ -30,8 +31,9 @@ router.get('/:roomId', doesRoomExist, (req, res) => {
   const roomInfo = {
     roomId: roomId
   }
-
-  res.render('room', roomInfo)
+  const domain = process.env.URL || 'http://localhost:3000/room/';
+  const fullUrl = domain+roomId;
+  res.render('room', {fullURL: fullUrl, roomId: roomId})
 })
 
 module.exports = router;
