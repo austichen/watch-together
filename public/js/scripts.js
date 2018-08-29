@@ -260,6 +260,7 @@ function initializeConnection() {
   })
   socket.on('scrub video', scrubToTime => {
     player.seekTo(scrubToTime, true);
+    updateProgressBar(scrubToTime);
   })
   socket.on('get current video status', (receiverSocket) => {
     console.log('get current video status');
