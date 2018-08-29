@@ -58,6 +58,39 @@ ul {
   box-sizing: content-box;
 }
 
+.chat-box {
+  width: 330px;
+  margin-left: 20px;
+  height: 420px;
+  background-color: #a9a9a9;
+  position: relative;
+}
+
+#chat-name-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+#message-box {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin-bottom: 0 !important;
+  z-index: 0;
+}
+
+.white-overlay {
+  background-color: rgba(255, 255, 255, 0.534);
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
 .card-img-top {
   float: left;
   margin-right: 10px;

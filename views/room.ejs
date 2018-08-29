@@ -27,16 +27,32 @@
           </div>
         </div>
       </div>
+      <div class="chat-box">
+        <div class="input-group mb-3" id="chat-name-input" >
+          <input type="text" class="form-control" id="chat-name" placeholder="Enter your display name to join">
+          <div class="input-group-append">
+            <button class="btn btn-primary" id="submit-name-button" type="button">Enter</button>
+          </div>
+        </div>
+        <div class="input-group mb-3" id="message-box" >
+            <input type="text" class="form-control">
+            <div class="input-group-append">
+              <button class="btn btn-primary" onclick="" type="button">Send</button>
+            </div>
+          </div>
+        <div class="white-overlay"></div>
+        <ul class="message-list"></ul>
+      </div>
     </div>
     <div class="row justify-content-center">
       <div class="col col-md-8">
-       <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search for a video here or paste a Youtube URL" id="youtube_search">
-        <div class="input-group-append">
-        <button class="btn btn-outline-secondary" onclick="searchForVideo()" type="button" id="search_button">Search</button>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Search for a video here or paste a Youtube URL" id="youtube_search">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" onclick="searchForVideo()" type="button" id="search_button">Search</button>
+          </div>
+        </div>
       </div>
-      </div>
-    </div>
     </div>
     <div class="video-results-container">
       <ul class="video-results"></ul>

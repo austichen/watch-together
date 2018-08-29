@@ -16,6 +16,21 @@ function copyLinkToClipboard() {
   }, 2000);
 }
 
+let chatName;
+
+$('#submit-name-button').click(e => {
+  onNameSubmission($('#chat-name').val());
+})
+
+function onNameSubmission(name) {
+  if (name!=='') {
+    chatName = name;
+    $('.white-overlay').css('display', 'none');
+    $('#chat-name-input').css('display', 'none');
+    console.log(chatName);
+  }
+}
+
 
 // YOUTUBE API STUFF
 let currentTime = 0, timeUpdater = null, videoLength, socket, videoDataForInit;
