@@ -21,7 +21,9 @@
             <div class="progress" style="height: 5px;">
               <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <span id="video-duration" class="font-weight-normal"></span>
+            <span class="font-weight-normal text-white">
+              <span id="current-time"></span> / <span id="video-duration"></span>
+            </span>
           </div>
         </div>
       </div>
@@ -29,7 +31,7 @@
     <div class="row justify-content-center">
       <div class="col col-md-8">
        <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search for a video here" id="youtube_search">
+        <input type="text" class="form-control" placeholder="Search for a video here or paste a Youtube URL" id="youtube_search">
         <div class="input-group-append">
         <button class="btn btn-outline-secondary" onclick="searchForVideo()" type="button" id="search_button">Search</button>
       </div>

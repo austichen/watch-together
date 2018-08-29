@@ -3,7 +3,7 @@ const router = require('express').Router();
 function doesRoomExist(req, res, next) {
     if (!req.app.locals.roomsList[req.params.roomId.toString()]) {
       //TODO make a proper error page if the room does not exist
-      return res.send('room not found');
+      return res.render('roomNotFound');
     }
     next();
 }

@@ -20,11 +20,13 @@ function copyLinkToClipboard() {
 // YOUTUBE API STUFF
 let currentTime = 0, timeUpdater = null, videoLength, socket, videoDataForInit;
 
-function youtubeApiInit() {
+async function youtubeApiInit() {
   const searchQuery = document.getElementById('youtube_search').value;
   //TODO: hide api key
+  const response = await fetch('/api/getYoutubeApiKey');
+  const youtubeApiKey = await response.text()
   gapi.client.init({
-    'apiKey': 'AIzaSyCulGJktSYgSIK7F5Xekdpb8__eNOYy1aI',
+    'apiKey': `${youtubeApiKey}`,
     'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest']
   }).then(() => {
     return gapi.client.youtube.search.list({
@@ -166,11 +168,16 @@ function updateTime() {
 
 function onVideoTimeUpdate(currentTime) {
   updateProgressBar(currentTime);
+  updateCurrentTime(currentTime);
 }
 
 function updateProgressBar(time) {
   let percentWatched = time*100/videoLength;
   $('.progress-bar').css('width', `${percentWatched}%`).attr('aria-valuenow', percentWatched);
+}
+
+function updateCurrentTime(currentTime) {
+  $('#current-time').html(convertSecondsToMins(currentTime));
 }
 
 // 5. The API calls this function when the player's state changes.
@@ -192,7 +199,7 @@ function onPlayerStateChange(event) {
     playToggle.addClass('fa-pause');
     videoLength = player.getDuration();
     timeupdater = setInterval(updateTime, 300);
-    $('#video-duration').html(getVideoDurationInMins(videoLength))
+    $('#video-duration').html(convertSecondsToMins(videoLength))
   } else if (event.data == 2) {
     console.log('pause at ', currentTime);
     playToggle.removeClass('fa-pause');
@@ -204,7 +211,7 @@ function onPlayerStateChange(event) {
   }
 }
 
-function getVideoDurationInMins(seconds) {
+function convertSecondsToMins(seconds) {
   let minutes = Math.floor(seconds/60);
   let _seconds = Math.round(seconds-(minutes*60));
   if(_seconds < 10) _seconds = '0'+_seconds;

@@ -5,6 +5,8 @@ const router = express.Router();
 const fetch = require('node-fetch')
 const ejs = require('ejs')
 
+require('dotenv').config()
+
 //socket io and server setup
 const port = process.env.PORT || 3000;
 const io = require('socket.io')
@@ -18,6 +20,10 @@ app.set('views', './views')
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname+'/public'));
 app.locals.roomsList = {};
+
+app.get('/api/getYoutubeApiKey', (req, res) => {
+  res.send(`${process.env.YOUTUBE_API_KEY}`)
+})
 
 app.get('/', (req, res) => {
   res.render('home')

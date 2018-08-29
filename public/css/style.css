@@ -27,7 +27,7 @@ ul {
 }
 
 .progress {
-  width: 490px;
+  width: 450px;
   transform: translateY(-2px);
   margin-right: 5px;
   display: inline-flex !important;
@@ -56,10 +56,6 @@ ul {
   width: 18px;
   padding-right: 10px;
   box-sizing: content-box;
-}
-
-#video-duration {
-  color: white;
 }
 
 .card-img-top {
