@@ -25,6 +25,9 @@
             <span class="font-weight-normal text-white">
               <span id="current-time"></span> / <span id="video-duration"></span>
             </span>
+            <span class="font-weight-normal text-white">
+              <i class="fas fa-user"></i><span id="viewer-count"></span>
+            </span>
           </div>
         </div>
       </div>
@@ -35,16 +38,16 @@
             <button class="btn btn-primary" id="submit-name-button" type="button">Enter</button>
           </div>
         </div>
-
         <div class="white-overlay"></div>
+        <div class="bg-primary text-dark font-weight-bold text-center" id="view-member-list-link">View chatroom user list</div>
         <div class="chat-elements-container">
-        <div class="input-group mb-3" id="message-box" >
-          <input type="text" class="form-control" id="message-input">
-          <div class="input-group-append">
-            <button class="btn btn-primary" onclick="" type="button" id="message-button">Send</button>
+          <div class="input-group mb-3" id="message-box" >
+            <input type="text" class="form-control" id="message-input">
+            <div class="input-group-append">
+              <button class="btn btn-primary" onclick="" type="button" id="message-button">Send</button>
+            </div>
           </div>
-        </div>
-        <div class="message-list-container"><ul class="message-list"></ul></div>
+          <div class="message-list-container"><ul class="message-list"></ul></div>
         </div>
       </div>
     </div>

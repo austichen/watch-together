@@ -29,8 +29,6 @@ app.get('/', (req, res) => {
   res.render('home')
 })
 
-//pass io to router
-
 app.use('/room', roomRoute);
 
 
@@ -47,37 +45,14 @@ const getCurrentVideo = (roomId, thisSocket) => {
   }
   //get a random client
   for (let clientId in clients ) {
-     //this is the socket of each client in the room.
-     let clientSocket = io.sockets.connected[clientId];
-     if (clientSocket !=thisSocket) {
-
-       console.log('clientSocket id: ',clientSocket.id)
-       io.to(clientSocket.id).emit('get current video status', thisSocket.id);
-       console.log('SUCCESS')
-       return null;
-     }
-
-}
-//in case anything goes wrong
-  //FOR DEVELOPTMENT ONLY REMOVE THIS AFTER
-  /*
-  if(!app.locals.roomsList[roomId]) {
-    return {
-      id: 'cZAw8qxn0ZE',
-      currentTime: 15,
-      isPlaying: false
+    //this is the socket of each client in the room.
+    let clientSocket = io.sockets.connected[clientId];
+    if (clientSocket !=thisSocket) {
+      console.log('clientSocket id: ',clientSocket.id)
+      io.to(clientSocket.id).emit('get current video status', thisSocket.id);
+      return null;
     }
   }
-  //FOR DEVELOPMENT ONLY REMOVE THIS AFTER
-  console.log(app.locals.roomsList)
-  console.log('roomID: ',roomId,' typeof: ',typeof roomId)
-  let roomData = app.locals.roomsList[roomId];
-  if(roomData) {
-    return roomData.videoData;
-  } else {
-    throw new Error("Room not found.")
-  }
-  */
 }
 
 const updateCurrentVideo = (roomId, videoId, videoTitle) => {
@@ -94,6 +69,18 @@ const getCurrentVideoTitle = roomId => {
       return currentRoom.videoData.title;
   }
 }
+
+const removeFromActiveUserList = (socketId, roomId) => {
+  console.log(app.locals.roomsList[roomId].activeUsersList)
+  let disconnectedUser;
+  app.locals.roomsList[roomId].activeUsersList.forEach((user, index) => {
+    if (user.socketId == socketId) {
+      disconnectedUser = app.locals.roomsList[roomId].activeUsersList.splice(index,1);
+    }
+  })
+  if (disconnectedUser === undefined) return null;
+  return disconnectedUser[0].name;
+}
 //sockets
 
 io.on('connection', socket => {
@@ -106,7 +93,9 @@ io.on('connection', socket => {
       if(app.locals.roomsList[roomId]==undefined) {
         return socket.disconnect();
       }
-      app.locals.roomsList[roomId].numUsers++;
+      app.locals.roomsList[currentRoomId].numUsers++;
+      if(app.locals.roomsList[currentRoomId].numUsers===1) app.locals.roomsList[currentRoomId].activeUsersList = []
+      io.sockets.in(currentRoomId).emit('update viewer count', app.locals.roomsList[currentRoomId].numUsers)
     });
 
     let currentVideoData = getCurrentVideo(roomId, socket);
@@ -129,10 +118,17 @@ io.on('connection', socket => {
       return socket.disconnect();
     }
     app.locals.roomsList[currentRoomId].numUsers--;
-    console.log(app.locals.roomsList[currentRoomId].numUsers)
+    //console.log(app.locals.roomsList[currentRoomId].numUsers)
     if (app.locals.roomsList[currentRoomId].numUsers<=0) {
       delete app.locals.roomsList[currentRoomId];
       console.log('deleting room')
+    } else {
+      let disconnectedUser = removeFromActiveUserList(socket.id, currentRoomId);
+      io.sockets.in(currentRoomId).emit('update viewer count', app.locals.roomsList[currentRoomId].numUsers);
+      if(disconnectedUser) {
+        io.sockets.in(currentRoomId).emit('update active users list', app.locals.roomsList[currentRoomId].activeUsersList);
+        io.sockets.in(currentRoomId).emit('user left', disconnectedUser);
+      }
     }
   })
   socket.on('set video', (roomId, videoId, videoTitle) => {
@@ -150,6 +146,11 @@ io.on('connection', socket => {
     io.sockets.in(currentRoomId).emit('scrub video', scrubToTime);
   })
   //messages
+  socket.on('user joined', userName => {
+    app.locals.roomsList[currentRoomId].activeUsersList.push({socketId: socket.id, name: userName});
+    io.sockets.in(currentRoomId).emit('user joined', userName)
+    io.sockets.in(currentRoomId).emit('update active users list', app.locals.roomsList[currentRoomId].activeUsersList);
+  })
   socket.on('send message', messageData => {
     io.sockets.in(currentRoomId).emit('receive message', messageData);
   })

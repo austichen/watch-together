@@ -16,7 +16,9 @@ function copyLinkToClipboard() {
   }, 2000);
 }
 
-
+function cleanInput(input) {
+  return $('<div/>').text(input).html();
+}
 
 //chat messages
 
@@ -30,24 +32,47 @@ $('#chat-name').keypress(function(e) {
   if (e.which === 13) onNameSubmission($(this).val())
 })
 
+$('.chat-box').hover(() => {
+  $('#view-member-list-link').toggleClass('show')
+}, () => {
+  $('#view-member-list-link').toggleClass('show')
+})
+
 function onNameSubmission(name) {
   if (name!=='') {
-    chatName = name;
+    chatName = cleanInput(name);
     $('.white-overlay').css('display', 'none');
     $('#chat-name-input').css('display', 'none');
     $('#message-input').focus();
+    socket.emit('user joined', name);
   }
+}
+
+function sendUserJoinedMessage(name) {
+  $('.message-list').append(
+    `<li class="text-center text-success"><span class="font-weight-bold">${name}</span> has joined the room!</li>`
+  )
+}
+function sendUserLeftMessage(name) {
+  $('.message-list').append(
+    `<li class="text-center text-dark"><span class="font-weight-bold">${name}</span> has left the room!</li>`
+  )
+}
+
+function updateActiveUsersList(activeUsers) {
+  console.log('active users: ',activeUsers);
 }
 
 $('#message-button').click(() => {
   if ($('#message-input').val() !='') {
     sendMessage($('#message-input').val());
   }
+  $('#message-input').focus();
 })
 
 $('#message-input').keypress(function(e) {
   if (e.which === 13 && $(this).val()!='') {
-    sendMessage($(this).val());
+    sendMessage(cleanInput($(this).val()));
   }
   console.log(e.which);
 })
@@ -60,7 +85,6 @@ function sendMessage(message) {
 function renderMessage(message, name, originSocket) {
   console.log(socket)
   if (originSocket == socket.id) {
-    console.log('oriign')
     $('.message-list').append(
       `<li class="text-right text-secondary"><span class="font-weight-bold text-primary">${name}</span>: ${message}</li>`
     )
@@ -174,6 +198,16 @@ function initializeVideo() {
     console.log('video is initialized to play');
     player.loadVideoById(videoDataForInit.id, videoDataForInit.currentTime+2);
     currentTime = videoDataForInit.currentTime+2;
+    setTimeout(() => {
+      let playerState = player.getPlayerState();
+      if(playerState!==1) {
+        player.seekTo(videoDataForInit.currentTime+2.5, true);
+        player.playVideo();
+        let playToggle = $('#play-toggle');
+        playToggle.removeClass('fa-play');
+        playToggle.addClass('fa-pause');
+      }
+    }, 500)
   } else {
     console.log('video is not playing');
     player.cueVideoById(videoDataForInit.id, videoDataForInit.currentTime);
@@ -206,7 +240,6 @@ function initializePlayerButtons() {
 }
 
 function unmuteVideo(volumeButton) {
-  console.log(volumeButton)
   volumeButton.removeClass('fa-volume-off');
   volumeButton.addClass('fa-volume-up');
   player.unMute();
@@ -296,6 +329,10 @@ function getVideoId() {
   return video_id;
 }
 
+function updateViewerCount(viewerCount) {
+  $('#viewer-count').html(`${viewerCount}`);
+}
+
 //SOCKET IO
 function initializeConnection() {
   console.log('client side')
@@ -353,6 +390,10 @@ function initializeConnection() {
     }
     socket.emit('receive current video status', {videoInfo: videoInfo, receiverSocket: receiverSocket})
   })
+  socket.on('update viewer count', viewerCount => updateViewerCount(viewerCount));
+  socket.on('user joined', userName => sendUserJoinedMessage(userName));
+  socket.on('user left', userName => sendUserLeftMessage(userName));
+  socket.on('update active users list', activeUsers => updateActiveUsersList(activeUsers));
   //messages
   socket.on('receive message', messageData => {
     const message = messageData.text;

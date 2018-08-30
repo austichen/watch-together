@@ -27,7 +27,7 @@ ul {
 }
 
 .progress {
-  width: 450px;
+  width: 430px;
   transform: translateY(-2px);
   margin-right: 5px;
   display: inline-flex !important;
@@ -65,6 +65,23 @@ ul {
   border: 1px solid #a9a9a9;
   position: relative;
   overflow-y: hidden;
+}
+
+#view-member-list-link {
+  width: 100%;
+  height: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #00aeff70 !important;
+  opacity: 0;
+  transition: opacity 1s ease-out;
+  overflow: hidden;
+}
+
+#view-member-list-link.show {
+  opacity: 1 !important;
+  height: 1.5rem !important;
 }
 
 .chat-elements-container {
