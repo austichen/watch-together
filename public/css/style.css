@@ -62,8 +62,31 @@ ul {
   width: 330px;
   margin-left: 20px;
   height: 420px;
-  background-color: #a9a9a9;
+  border: 1px solid #a9a9a9;
   position: relative;
+  overflow-y: hidden;
+}
+
+.chat-elements-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.message-list-container {
+  max-height: 390px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 0 10px 0 10px;
+}
+
+.message-list {
+  margin-bottom: 0px;
+}
+
+.message-list li {
+  word-wrap: break-word;
 }
 
 #chat-name-input {
@@ -74,9 +97,6 @@ ul {
 }
 
 #message-box {
-  position: absolute;
-  bottom: 0;
-  left: 0;
   margin-bottom: 0 !important;
   z-index: 0;
 }

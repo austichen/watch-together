@@ -16,10 +16,18 @@ function copyLinkToClipboard() {
   }, 2000);
 }
 
+
+
+//chat messages
+
 let chatName;
 
 $('#submit-name-button').click(e => {
   onNameSubmission($('#chat-name').val());
+})
+
+$('#chat-name').keypress(function(e) {
+  if (e.which === 13) onNameSubmission($(this).val())
 })
 
 function onNameSubmission(name) {
@@ -27,10 +35,41 @@ function onNameSubmission(name) {
     chatName = name;
     $('.white-overlay').css('display', 'none');
     $('#chat-name-input').css('display', 'none');
-    console.log(chatName);
+    $('#message-input').focus();
   }
 }
 
+$('#message-button').click(() => {
+  if ($('#message-input').val() !='') {
+    sendMessage($('#message-input').val());
+  }
+})
+
+$('#message-input').keypress(function(e) {
+  if (e.which === 13 && $(this).val()!='') {
+    sendMessage($(this).val());
+  }
+  console.log(e.which);
+})
+
+function sendMessage(message) {
+  socket.emit('send message', {text: message, name: chatName, originSocket: socket.id});
+  $('#message-input').val('');
+}
+
+function renderMessage(message, name, originSocket) {
+  console.log(socket)
+  if (originSocket == socket.id) {
+    console.log('oriign')
+    $('.message-list').append(
+      `<li class="text-right text-secondary"><span class="font-weight-bold text-primary">${name}</span>: ${message}</li>`
+    )
+  } else {
+    $('.message-list').append(
+      `<li class="text-secondary"><span class="font-weight-bold">${name}</span>: ${message}</li>`
+    )
+  }
+}
 
 // YOUTUBE API STUFF
 let currentTime = 0, timeUpdater = null, videoLength, socket, videoDataForInit;
@@ -60,7 +99,7 @@ async function youtubeApiInit() {
 }
 
 function renderVideoCard(video) {
-  return `<li><div class="card" onclick="setVideo('${video.id.videoId}')">
+  return `<li><div class="card" onclick="setVideo('${video.id.videoId}', '${video.snippet.title}')">
     <div class="card-body">
       <img class="card-img-top"
         src="${video.snippet.thumbnails.default.url}"
@@ -74,13 +113,19 @@ function renderVideoCard(video) {
   </div></li>`
 }
 
+$('#youtube_search').keypress(function(e) {
+  if (e.which === 13 && $(this).val()!='') {
+    searchForVideo();
+  }
+})
+
 function searchForVideo() {
   gapi.load('client', youtubeApiInit)
 }
 
-function setVideo(id) {
-  console.log('video id: ', id)
-  socket.emit('set video', roomId, id);
+function setVideo(id, title) {
+  console.log('video title: ',title)
+  socket.emit('set video', roomId, id, `${title}`);
 }
 //youtube video player
 
@@ -134,6 +179,11 @@ function initializeVideo() {
     player.cueVideoById(videoDataForInit.id, videoDataForInit.currentTime);
     currentTime = videoDataForInit.currentTime;
   }
+  setVideoTitle(`${videoDataForInit.title}`);
+}
+
+function setVideoTitle(title) {
+  $('#video-title').html(title);
 }
 
 function initializePlayerButtons() {
@@ -262,10 +312,11 @@ function initializeConnection() {
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   })
-  socket.on('set video', videoId => {
+  socket.on('set video', (videoId, videoTitle) => {
     console.log('set video')
     player.loadVideoById(videoId);
     currentTime=0;
+    setVideoTitle(videoTitle);
   })
   socket.on('pause video', () => {
     player.pauseVideo();
@@ -301,5 +352,14 @@ function initializeConnection() {
 
     }
     socket.emit('receive current video status', {videoInfo: videoInfo, receiverSocket: receiverSocket})
+  })
+  //messages
+  socket.on('receive message', messageData => {
+    const message = messageData.text;
+    const name = messageData.name;
+    const originSocket = messageData.originSocket;
+    renderMessage(message, name, originSocket);
+    const messageListContainer = $('.message-list-container')
+    messageListContainer.scrollTop(messageListContainer.prop('scrollHeight'))
   })
 }

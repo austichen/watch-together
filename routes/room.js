@@ -17,8 +17,7 @@ router.get('/create/:roomId', (req, res) => {
       numUsers: 0,
       videoData: {
         id: 'cZAw8qxn0ZE',
-        currentTime: 15,
-        isPlaying: false
+        title: 'La la land'
       }
     }
     req.app.locals.roomsList[roomId.toString()] = roomData;

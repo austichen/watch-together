@@ -80,10 +80,20 @@ const getCurrentVideo = (roomId, thisSocket) => {
   */
 }
 
-const updateCurrentVideo = (roomId, videoId) => {
-  app.locals.roomsList[roomId].videoData.id=videoId;
+const updateCurrentVideo = (roomId, videoId, videoTitle) => {
+  const currentRoom = app.locals.roomsList[roomId];
+  if(currentRoom!==undefined) {
+    currentRoom.videoData.id=videoId;
+    currentRoom.videoData.title=videoTitle;
+  }
 }
 
+const getCurrentVideoTitle = roomId => {
+  const currentRoom = app.locals.roomsList[roomId];
+  if(currentRoom!==undefined) {
+      return currentRoom.videoData.title;
+  }
+}
 //sockets
 
 io.on('connection', socket => {
@@ -101,6 +111,7 @@ io.on('connection', socket => {
 
     let currentVideoData = getCurrentVideo(roomId, socket);
     if(currentVideoData!=null) {
+      currentVideoData.title = getCurrentVideoTitle(currentRoomId);
       socket.emit('initialize video', currentVideoData);
     }
 
@@ -108,6 +119,7 @@ io.on('connection', socket => {
   })
   socket.on('receive current video status', returnObject => {
     let currentVideoData = returnObject.videoInfo;
+    currentVideoData.title = getCurrentVideoTitle(currentRoomId);
     let receiverSocketId = returnObject.receiverSocket;
     console.log('currentVideoData: ', currentVideoData);
     io.to(receiverSocketId).emit('initialize video', currentVideoData);
@@ -123,10 +135,10 @@ io.on('connection', socket => {
       console.log('deleting room')
     }
   })
-  socket.on('set video', (roomId, videoId) => {
-    updateCurrentVideo(roomId, videoId);
+  socket.on('set video', (roomId, videoId, videoTitle) => {
+    updateCurrentVideo(roomId, videoId, `${videoTitle}`);
     console.log('room id: ',roomId,' typeof: ',typeof roomId)
-    io.sockets.in(roomId).emit('set video', videoId);
+    io.sockets.in(roomId).emit('set video', videoId, `${videoTitle}`);
   })
   socket.on('pause video', roomId => {
     io.sockets.in(roomId).emit('pause video');
@@ -136,5 +148,9 @@ io.on('connection', socket => {
   })
   socket.on('scrub video', scrubToTime => {
     io.sockets.in(currentRoomId).emit('scrub video', scrubToTime);
+  })
+  //messages
+  socket.on('send message', messageData => {
+    io.sockets.in(currentRoomId).emit('receive message', messageData);
   })
 })
