@@ -39,7 +39,16 @@
           </div>
         </div>
         <div class="white-overlay"></div>
-        <div class="bg-primary text-dark font-weight-bold text-center" id="view-member-list-link">View chatroom user list</div>
+        <div class="bg-primary text-dark font-weight-bold text-center" id="view-member-list-link">
+          <a tabindex="0"
+            role="button"
+            data-toggle="popover"
+            data-trigger="focus"
+            id="view-member-list-link-text"
+          >
+            View chatroom user list
+          </a>
+        </div>
         <div class="chat-elements-container">
           <div class="input-group mb-3" id="message-box" >
             <input type="text" class="form-control" id="message-input">

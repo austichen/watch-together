@@ -59,8 +59,27 @@ function sendUserLeftMessage(name) {
   )
 }
 
+$('#view-member-list-link-text').popover({
+  trigger: 'focus',
+  content: '',
+  html: true,
+  template: '<div class="popover" role="tooltip"><div class="arrow"></div><ul class="popover-body"></ul></div>'
+});
+
 function updateActiveUsersList(activeUsers) {
-  console.log('active users: ',activeUsers);
+  $('#view-member-list-link-text').attr('data-content', `${createActiveUsersListHTML(activeUsers)}`);
+  let popover = $('#view-member-list-link-text').data('popover');
+  popover.setContent();
+  popover.$tip.addClass(popover.options.placement);
+}
+
+function createActiveUsersListHTML(activeUsers) {
+  console.log('generate html function called');
+  let returnString = '';
+  for (user of activeUsers) {
+    returnString+=`<li>${user.name}</li>`;
+  }
+  return returnString;
 }
 
 $('#message-button').click(() => {
