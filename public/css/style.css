@@ -12,7 +12,7 @@ ul {
   transform: translateY(-10px);
   pointer-events: all;
   width: 100%;
-  height: 30px;
+  min-height: 30px;
   background-color: black;
 }
 
@@ -27,7 +27,7 @@ ul {
 }
 
 .progress {
-  width: 430px;
+  width: 400px;
   transform: translateY(-2px);
   margin-right: 5px;
   display: inline-flex !important;
@@ -42,7 +42,8 @@ ul {
 }
 
 .player-container {
-  height: 420px;
+  min-height: 420px;
+  width: 640px;
   pointer-events: none;
 }
 
@@ -68,12 +69,13 @@ ul {
 }
 
 #view-member-list-link {
+  display: block;
   width: 100%;
-  height: 0;
+  height: 1.5rem;
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #00aeff70 !important;
+  background-color: #00aeff !important;
   opacity: 0;
   transition: opacity 1s ease-out;
   overflow: hidden;
@@ -82,7 +84,6 @@ ul {
 
 #view-member-list-link.show {
   opacity: 1 !important;
-  height: 1.5rem !important;
 }
 
 .chat-elements-container {
