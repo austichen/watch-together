@@ -1,8 +1,6 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
-
-const fetch = require('node-fetch')
 const ejs = require('ejs')
 
 require('dotenv').config()

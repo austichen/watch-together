@@ -77,7 +77,7 @@ function createActiveUsersListHTML(activeUsers) {
   console.log('generate html function called');
   let returnString = '';
   for (user of activeUsers) {
-    returnString+=`<li>${user.name}</li>`;
+    returnString+=`<li class="font-weight-normal text-info">${user.name}</li>`;
   }
   return returnString;
 }
@@ -228,7 +228,7 @@ function initializeVideo() {
       }
     }, 500)
   } else {
-    console.log('video is not playing');
+    console.log(`video is not playing; current time: ${videoDataForInit.currentTime}`);
     player.cueVideoById(videoDataForInit.id, videoDataForInit.currentTime);
     currentTime = videoDataForInit.currentTime;
   }
@@ -242,9 +242,10 @@ function setVideoTitle(title) {
 function initializePlayerButtons() {
   $('#play-toggle').click(() => {
     let playerState = player.getPlayerState();
+    //console.log('play button pressed, state: ',playerState);
     if(playerState === 1) {
       socket.emit('pause video', roomId);
-    } else if (playerState === 0 || playerState === 5 || playerState === 2) {
+    } else if (playerState === 0 || playerState === 5 || playerState === 2 || playerState === -1) {
       socket.emit('play video', roomId);
     }
   });
@@ -379,6 +380,7 @@ function initializeConnection() {
   })
   socket.on('play video', () => {
     player.playVideo();
+    console.log('received play video scoket');
   })
   socket.on('scrub video', scrubToTime => {
     player.seekTo(scrubToTime, true);
