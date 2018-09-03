@@ -1,9 +1,9 @@
 <%- include('partials/header'); %>
   <div class="container">
-    <h1 class="text-center text-danger">Watch Along</h1>
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-5">
       <div class="col col-sm-12 col-md-8">
-        <p class="text-center text-muted">
+        <h1 class="text-center text-body display-1">Watch Along</h1>
+        <p class="text-center lead text-muted mt-3 mb-4">
           Watch your favourite videos simultaneously with your friends! Click the
           button below to try it out for yourself.
         </p>
@@ -11,6 +11,27 @@
     </div>
     <div class="row justify-content-center">
       <button onclick="createRoom()" class="btn btn-outline-info btn-lg">Create a room</button>
+    </div>
+    <div class="row mt-5 justify-content-center">
+      <div class="col col-md-6 col-xl-4 px-2">
+        <h1 class="text-center display-5 font-weight-light text-primary">Find your favourite videos</h1>
+        <image src="/images/search.png" class="img-fluid my-3"></image>
+        <p class="lead">Simply search for your top Youtube videos to play them on the big screen.</p>
+      </div>
+      <div class="col col-md-6 col-xl-4 px-2">
+        <h1 class="text-center display-5 font-weight-light text-primary">Sync up with everyone</h1>
+        <image src="/images/sync.png" class="img-fluid my-3 rounded"></image>
+        <p class="lead">When you play, pause, or scrub your video, everyone else
+          in the room will experience it as well. Your video watching experience
+          is fully syncrhonized.
+        </p>
+      </div>
+      <div class="col col-md-6 col-xl-4 px-2">
+        <h1 class="text-center display-5 font-weight-light text-primary">Chat with your friends</h1>
+        <image src="/images/chat.png" class="img-fluid my-3 rounded"></image>
+        <p class="lead">Share your reactions to your favourite moments with your
+        friends using the live chat.</p>
+      </div>
     </div>
   </div>
 

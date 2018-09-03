@@ -410,7 +410,7 @@ function initializeConnection() {
         videoInfo.currentTime = player.getCurrentTime();
         videoInfo.isPlaying = true;
       } else if (playerState == 0) {
-        videoInfo.currentTime = player.getDuration();
+        videoInfo.currentTime = player.getDuration()+3;
         videoInfo.isPlaying = false;
       } else {
         videoInfo.currentTime = player.getCurrentTime();
