@@ -126,7 +126,6 @@ let currentTime = 0, timeUpdater = null, videoLength, socket, videoDataForInit;
 
 async function youtubeApiInit() {
   const searchQuery = document.getElementById('youtube_search').value;
-  //TODO: hide api key
   const response = await fetch('/api/getYoutubeApiKey');
   const youtubeApiKey = await response.text()
   gapi.client.init({
@@ -149,7 +148,8 @@ async function youtubeApiInit() {
 }
 
 function renderVideoCard(video) {
-  return `<li><div class="card" onclick="setVideo('${video.id.videoId}', '${video.snippet.title}')">
+  console.log(video.snippet.title.replace(/['"`]+/g, '\\"'))
+  return `<li><div class="card" onclick="setVideo('${video.id.videoId}', '${video.snippet.title.replace(/['"`]+/g, '')}')">
     <div class="card-body">
       <img class="card-img-top"
         src="${video.snippet.thumbnails.default.url}"
@@ -174,7 +174,6 @@ function searchForVideo() {
 }
 
 function setVideo(id, title) {
-  //console.log('video title: ',title)
   socket.emit('set video', roomId, id, `${title}`);
 }
 //youtube video player
@@ -240,7 +239,7 @@ function initializeVideo() {
     player.cueVideoById(videoDataForInit.id, videoDataForInit.currentTime);
     currentTime = videoDataForInit.currentTime;
   }
-  setVideoTitle(`${videoDataForInit.title}`);
+  setVideoTitle(`${videoDataForInit.title.replace(/['"`]+/g, '\"')}`);
 }
 
 function setVideoTitle(title) {
