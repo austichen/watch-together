@@ -338,7 +338,7 @@ function onPlayerStateChange(event) {
 
 function convertSecondsToMins(seconds) {
   let minutes = Math.floor(seconds/60);
-  let _seconds = Math.round(seconds-(minutes*60));
+  let _seconds = Math.floor(seconds-(minutes*60));
   if(_seconds < 10) _seconds = '0'+_seconds;
   return `${minutes}:${_seconds}`;
 }
