@@ -9,4 +9,4 @@ To run locally:
 
 `node index.js`
 
-Navigate to `http://localhost:8000` and enjoy!
+Navigate to `http://localhost:3000` and enjoy!
