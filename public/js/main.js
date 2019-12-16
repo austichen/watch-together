@@ -148,8 +148,7 @@ async function youtubeApiInit() {
 }
 
 function renderVideoCard(video) {
-  console.log(video.snippet.title.replace(/['"`]+/g, '\\"'))
-  return `<li><div class="card" onclick="setVideo('${video.id.videoId}', '${video.snippet.title.replace(/['"`]+/g, '')}')">
+  return `<li><div class="card" onclick="setVideo('${video.id.videoId}', '${video.snippet.title.replace(/&#39;|['"`]+/g, '')}')">
     <div class="card-body">
       <img class="card-img-top"
         src="${video.snippet.thumbnails.default.url}"
