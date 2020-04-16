@@ -311,7 +311,6 @@ var done = false;
 
 function onPlayerStateChange(event) {
   const playToggle = $('#play-toggle');
-  const currentTime = event.target.j.currentTime;
   if (event.data == -1) {
     //console.log('new video at');
   } else if (event.data == 5) {
